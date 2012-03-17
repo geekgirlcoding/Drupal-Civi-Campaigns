@@ -17,7 +17,8 @@
 *
 */
 
-file_put_contents("/tmp/profile.log", "\n\n(" . $_REQUEST['q'] . ")", FILE_APPEND);
+
+file_put_contents(file_create_path(file_directory_path(). "/tmp/profile.log"), "\n\n(" . $_REQUEST['q'] . ")", FILE_APPEND); 
 
 define("PERM_ACCESS_DW_CAMPAIGN", 'access derby/walk pages');
 define("PERM_USER_DW_CAMPAIGN", 'user Derby/Walk Campaigns module');

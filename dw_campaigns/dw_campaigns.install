@@ -10,7 +10,7 @@ function dw_campaigns_uninstall() {
 
 function dw_campaigns_try_adding_derby() {
 	$types = array();
-	$type_result = db_query('SELECT * FROM {node_type} WHERE type like "dw_campaign_%"');
+	$type_result = db_query('SELECT * FROM {node_type} WHERE type like "dw_campaigns_%"');
 	while ($type = db_fetch_array($type_result)) {
 		$types[$type['type']] = $type;
 	}
@@ -19,8 +19,8 @@ function dw_campaigns_try_adding_derby() {
 		drupal_set_message('Added Derby Content Type', 'status');
 
 		install_include(array('content', 'content_copy'));
-		$file = drupal_get_path('module', 'dw_campaigns') . '/content_type-dw_campaign_derby.txt';
-		install_content_copy_import_from_file($file, '');
+		$file = drupal_get_path('module', 'dw_campaigns') . '/content_type-dw_campaigns_derby.txt';
+		install_content_copy_import_from_file($file, $type_name = '');
 	} else {
 		drupal_set_message('Skipped Adding Derby Content Type', 'status');
 	}
@@ -84,7 +84,7 @@ function dw_campaigns_schema() {
             'pcp'	                => array('type' => 'int',       'not null' => TRUE),
             'options'                   => array('type' => 'text',      'not null' => TRUE),        
         ),
-        'primary key' => array('mapping_id'),
+        'primary key' => array('privacy_id'),
     );
     
     $schema['dw_campaigns_user_notify_settings'] = array(
@@ -95,7 +95,7 @@ function dw_campaigns_schema() {
             'notify_weekly_report'                      => array('type' => 'int',	'length' => 1, 'not null' => TRUE),
             'notify_campaign_progress'                  => array('type' => 'int',	'length' => 1, 'not null' => TRUE),
 	),
-	'unique keys' => array('drupal_id'),
+			'unique key' => array('drupal_id'),
     );
     
     return $schema;

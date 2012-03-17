@@ -149,11 +149,11 @@ function civicrm_query($page, $params = array(), $cacheable = FALSE, $post = FAL
 
     $baseUrl        = sprintf("%s/%s", $dw_settings['restUrl'], $page);
 
-    file_put_contents("/tmp/profile.log", "\nSTART " . time() . "\n", FILE_APPEND);
+    file_put_contents(file_create_path(file_directory_path(). "/tmp/profile.log"), "\nSTART " . time() . "\n", FILE_APPEND);
 
     $queryString    = http_build_query( $params );
 
-    file_put_contents("/tmp/profile.log", "$baseUrl $queryString", FILE_APPEND);
+    file_put_contents(file_create_path(file_directory_path(). "/tmp/profile.log"), "$baseUrl $queryString", FILE_APPEND);
 
     $data   = NULL;
 
@@ -177,7 +177,7 @@ function civicrm_query($page, $params = array(), $cacheable = FALSE, $post = FAL
                     }
                 } else {
                     $data   = file_get_contents($cache_file);         
-                    file_put_contents("/tmp/profile.log", " (CACHED)\n", FILE_APPEND);
+                    file_put_contents(file_create_path(file_directory_path(). "/tmp/profile.log"), " (CACHED)\n", FILE_APPEND);
                 }
             }
         
@@ -192,7 +192,7 @@ function civicrm_query($page, $params = array(), $cacheable = FALSE, $post = FAL
         $cnt        = preg_match('/(<\?xml version="1.0"\?>.*)/sm', $data, $match);
         $newdata    = $match[0];
         if(strlen($newdata) == 0) {
-            file_put_contents("/tmp/ERR-" . microtime(TRUE), $cache_file . "\n" . $data);
+            file_put_contents(file_create_path(file_directory_path(). "/tmp/ERR-" . microtime(TRUE)), $cache_file . "\n" . $data);
         }
     } else {
 
@@ -202,15 +202,16 @@ function civicrm_query($page, $params = array(), $cacheable = FALSE, $post = FAL
         
     $result     = simplexml_load_string($newdata);
 
-    file_put_contents("/tmp/profile.log", "\nEND " . time() . "\n\n", FILE_APPEND);
+    file_put_contents(file_create_path(file_directory_path(). "/tmp/profile.log"), "\nEND " . time() . "\n\n", FILE_APPEND);
 
     if($debug) {
         echo $url . "\n<br>\n";
     }
 
     if($cacheable && $dirty && strlen($data) > 0) {
-
-        file_put_contents($cache_file, $data);
+       $cache_path = drupal_get_path('module','dw_campaigns') . '/civi_cache/'. $cache_file;
+       /** print "Cache Path is : "  . $cache_path; **/
+        file_put_contents($cache_path, $data);
     }
     
     return $result;
@@ -247,7 +248,7 @@ function _dw_do_login() {
         try {
             $loginResults               = civicrm_rest_login($dw_settings['loginName'], $dw_settings['loginPass']);
         } catch(Exception $e) {
-            echo "Unable to login. Please Contact Support";
+            echo "Unable to login. with " . $dw_settings['loginName'] . "Please Contact Support";
             die;
         }
         $dw_settings['apiKey']      = $loginResults['apiKey'];
@@ -405,7 +406,7 @@ function _dw_civicrm_contributionpage_get($params) {
         $return->contribution_type_id = NULL; // this is what it seems to be looking for
     } else {
         if(!isset($res->Result)) {
-            file_put_contents("/tmp/bah", print_r($res, TRUE));
+            file_put_contents(file_create_path(file_directory_path(). "/tmp/bah"), print_r($res, TRUE));
         } else {
         $return = _dw_undo_simplexml($res->Result->children());
         }
@@ -510,7 +511,7 @@ function _dw_civicrm_pcp_get($params) {
                 $error['res']    = $res;
                 $error['data']   = $_REQUEST;
 
-                file_put_contents("/tmp/NULL_ID", serialize($error));
+                file_put_contents(file_create_path(file_directory_path(). "/tmp/NULL_ID"), serialize($error));
             } else {
                 $return->$id    = $res;
             }
